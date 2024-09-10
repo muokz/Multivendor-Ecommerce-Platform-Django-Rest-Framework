@@ -1,0 +1,40 @@
+php artisan serve
+
+model
+php artisan make:model Note
+php artisan migrate
+
+database
+php artisan  make:factory NoteFactory --model=Note
+php artisan db:seed or php artisan migrate --seed or php artisan migrate:refresh --seed
+
+controller
+php artisan make:controller NoteController --resource --model=Note
+
+
+views
+php artisan make:view note.index
+php artisan make:view note.create
+php artisan make:view note.edit
+php artisan make:view note.show
+
+
+roles defined
+database
+content in z
+views created
+select content from db and parse to views
+render the data in viewds
+
+
+npm run dev
+npm run build
+
+
+users and login
+composer require laravel/breeze --dev
+php artisan breeze:install
+
+
+git config --global user.email "stevemuokz@gmail.com"
+ git config --global user.name "muokz"
