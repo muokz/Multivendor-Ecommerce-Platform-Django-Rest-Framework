@@ -252,11 +252,11 @@ function UpdateProduct(){
                                 </div>
                                 <div className="mb-3">
                                     <label for="formFile" className="form-label">Product Images</label>
-                                    <input className="form-control" type="file" multiple onChange={multipleFilesHandler} name="product_imgs" id="image"/>
+                                    <input className="form-control mb-2" type="file" multiple onChange={multipleFilesHandler} name="product_imgs" id="image"/>
                                     {
                                         ProductData.product_imgs && ProductData.product_imgs.map((img,index)=>
                                         <span onClick={()=>deleteImage(img.id)}>
-                                            <i className="text-danger" role='button'><XCircle/></i>
+                                            <i className="delete-imgbtn" role='button'><XCircle/></i>
                                             <img src={img.image} className="img rounded border mt-2 me-2" width='200' />
                                         </span>
                                     )

@@ -11,6 +11,10 @@ urlpatterns = [
     path('vendor/<int:pk>/', views.VendorDetail.as_view()),
     path('vendor/register/', views.VendorRegister,name='vendor'),
     path('vendor/login/', views.VendorLogin,name='vendor'),
+    path('vendor/<int:pk>/orderitems/', views.VendorOrderItemList.as_view()),
+    path('vendor/<int:pk>/customers/', views.VendorCustomerList.as_view()),
+    path('vendor/<int:vendor_id>/customer/<int:customer_id>/orderitems/', views.VendorCustomerOrderItemList.as_view()),
+    
 
 
     path('products/', views.ProductList.as_view()),
@@ -34,6 +38,8 @@ urlpatterns = [
     path('customer/<int:pk>/orderitems/', views.CustomerOrderItemList.as_view()),
     path('update-order-status/<int:order_id>', views.update_order_status,name='update_order_status'),
     path('update_product_download_count/<int:product_id>', views.update_product_download_count,name='update_product_download_count'),
+    path('order-modify/<int:pk>', views.OrderModify.as_view()),
+    path('delete-customer-orders/<int:pk>', views.delete_customer_orders,name='delete_customer_orders'),
 
     
     path('wishlist/', views.WishList.as_view()),

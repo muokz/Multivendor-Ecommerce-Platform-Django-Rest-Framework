@@ -37,6 +37,7 @@
   margin: auto;
   right: 0;
 }
+.delete-imgbtn{position: absolute;padding:4px;border-radius:10px;background-color: red;color: #fff;}
 .fttxt a{text-decoration: none !important;color:#333;}
 .offcanvas{width: 70% !important;}
 .hidenav{display:none !important;}

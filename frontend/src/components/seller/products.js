@@ -1,3 +1,4 @@
+import axios from "axios";
 import {Link} from 'react-router-dom';
 import { CheckCircle, Loader, PlusCircle, Edit, Trash} from 'react-feather';
 import Sidebar from './sidebar';
@@ -6,7 +7,6 @@ import { CurrencyContext } from "../../context";
 function SellerProducts(){
     const baseUrl = 'http://127.0.0.1:8000/api';
     const [ProductData,setProductData]=useState([]);
-    const customerId = localStorage.getItem('customer_id');
     const {CurrencyData}=useContext(CurrencyContext);
 
     useEffect(()=>{
@@ -19,6 +19,20 @@ function SellerProducts(){
         .then((data) => {
             setProductData(data.results);
         });
+    }
+    function showConfirm(product_id){
+        var _confirm=window.confirm('Are your sure you want to delete?');
+        if(_confirm){
+            axios.delete(baseUrl+'/product/'+product_id+'/')
+            .then(function (response){
+                if(response.status==204){
+                    fetchData(baseUrl+'/products');
+                 }
+            })
+            .catch(function(error){
+                console.log(error);
+            });
+        }
     }
     console.log(ProductData);
     return (
@@ -62,7 +76,7 @@ function SellerProducts(){
                                             </td>
                                             <td>
                                                 <Link to={`/seller/update-product/${product.id}`}><button className="btn btn-success border-0 ms-2"><Edit /></button></Link>
-                                                <Link to="/product/python-timer/123"><button className="btn btn-danger border-0 ms-2"><Trash /></button></Link>
+                                                <button onClick={()=>showConfirm(product.id)} className="btn btn-danger border-0 ms-2"><Trash /></button>
                                             </td>
                                         </tr>
                                     })

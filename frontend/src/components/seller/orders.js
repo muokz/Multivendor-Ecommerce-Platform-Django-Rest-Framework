@@ -1,8 +1,40 @@
-import logo from '../../logo.svg';
+import axios from "axios";
 import {Link} from 'react-router-dom';
-import { CheckCircle, Loader} from 'react-feather';
 import Sidebar from './sidebar';
+import { CheckCircle, Loader} from 'react-feather';
+import { useState,useContext,useEffect } from 'react';
+import { CurrencyContext } from "../../context";
 function SellerOrders(){
+    const [OrderItems,setOrderItems]=useState([]);
+    const baseUrl = 'http://127.0.0.1:8000/';
+    const vendorId = localStorage.getItem('vendor_id');
+
+    const {CurrencyData}=useContext(CurrencyContext);
+
+    useEffect(()=>{
+        fetchData(baseUrl+'/api/vendor/'+vendorId+'/orderitems');
+    },[]);
+
+    function fetchData(baseurl){
+        fetch(baseurl)
+        .then((response) => response.json())
+        .then((data) => {
+           setOrderItems(data.results);
+        });
+    }
+    function changeOrderStatus(order_id,ord_status){
+        //SUBMIT DATA
+        axios.patch(baseUrl+'/api/order-modify/'+order_id,{
+            "order_status":ord_status,
+        })
+        .then(function (response){
+            fetchData(baseUrl+'/api/vendor/'+vendorId+'/orderitems');
+        })
+        .catch(function(error){
+            console.log(error);
+        });
+    }
+    console.log(OrderItems);
     return (
         <section className="container mtopcon">
             <div className="row">
@@ -22,42 +54,45 @@ function SellerOrders(){
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td><Link to="/product/python-timer/123"><img src={logo} className="img-thumbnail" width="80"  alt="..."/><span className="p-4">Mark</span></Link></td>
-                                    <td>Ksh 200</td> 
-                                    <td><Link to="/product/python-timer/123"><button className="btn btn-outline-success border-0"><CheckCircle /> Complete</button></Link></td>
-                                    <td>
-                                        <div class="btn-group" role="group">
-                                            <button type="button" class="btn btn-outline-dark btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                            Change Status
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li><Link to="/product/python-timer/123" class="dropdown-item" href="#">Approved</Link></li>
-                                                <li><Link to="/product/python-timer/123" class="dropdown-item" href="#">Sent</Link></li>
-                                                <li><Link to="/product/python-timer/123" class="dropdown-item" href="#">Complete</Link></li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td><Link to="/product/python-timer/123"><img src={logo} className="img-thumbnail" width="80"  alt="..."/><span className="p-4">Mark</span></Link></td>
-                                    <td>Ksh 200</td> 
-                                    <td><Link to="/product/python-timer/123"><button className="btn btn-outline-warning border-0"><Loader /> Processing</button></Link></td>
-                                    <td>
-                                        <div class="btn-group" role="group">
-                                            <button type="button" class="btn btn-outline-dark btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                            Change Status
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li><Link to="/product/python-timer/123" class="dropdown-item" href="#">Approved</Link></li>
-                                                <li><Link to="/product/python-timer/123" class="dropdown-item" href="#">Sent</Link></li>
-                                                <li><Link to="/product/python-timer/123" class="dropdown-item" href="#">Complete</Link></li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
+                                {
+                                    OrderItems.map((item,index)=>{ 
+                                        return <tr>
+                                        <td>{index+1}</td>
+                                        <td><Link to={`/product/${item.product.title}/${item.product.id}`}><img src={`${baseUrl}/${item.product.image}`} className="img-thumbnail" width="80"  alt="..."/><span className="p-4">{item.product.title}</span></Link></td>
+                                        <td>
+                                            {
+                                                CurrencyData != 'usd' && <p className="card-title text-info">Ksh. {item.product.price}</p>
+                                            }
+                                            {
+                                                CurrencyData == 'usd' && <p className="card-title text-info">${item.product.usd_price}</p>
+                                            }
+                                        </td> 
+                                        <td>
+                                            {
+                                                item.order.order_status==true && <button className="btn btn-outline-success border-0"><CheckCircle /> {item.order.order_status}</button>
+                                            }
+                                            {
+                                                item.order.order_status==false && <button className="btn btn-outline-warning border-0"><Loader /> {item.order.order_status}</button>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="btn btn-outline-dark btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Change Status
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    {
+                                                        item.order.order_status==true && <li><a class="dropdown-item" href="#">Completed</a></li>
+                                                    }
+                                                    {
+                                                        item.order.order_status==false && <li><a onClick={()=>changeOrderStatus(item.order.id,true)} class="dropdown-item" href="#">Complete</a></li>
+                                                    }                                                    
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    })
+                                }
                             </tbody>
                         </table>
                     </div>

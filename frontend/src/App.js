@@ -40,6 +40,7 @@ import SellerCustomers from './components/seller/customers';
 import SellerReports from './components/seller/reports';
 import SellerProfile from './components/seller/profile';
 import SellerChangePassword from './components/seller/change-password';
+import SellerCustomerOrders from './components/seller/customerorders';
 
 import { CartContext, CurrencyContext } from './context';
 import {useState} from 'react';
@@ -87,6 +88,7 @@ function App() {
         <Route path='/seller/update-product/:product_id' element={<UpdateProduct/>} /> 
         <Route path='/seller/orders' element={<SellerOrders/>} />
         <Route path='/seller/customers' element={<SellerCustomers/>} />
+        <Route path='/seller/customer/:customer_id/orderitems' element={<SellerCustomerOrders/>} />
         <Route path='/seller/reports' element={<SellerReports/>} />
         <Route path='/seller/profile' element={<SellerProfile/>} />
         <Route path='/seller/change-password' element={<SellerChangePassword/>} />
