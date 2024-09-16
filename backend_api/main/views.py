@@ -505,8 +505,8 @@ def mpesapay(request,customer_id):
     amount=request.POST.get('amount')
     mobile=request.POST.get('mobile')
     email=request.POST.get('email')
-    publishable_key = "ISPubKey_live_afc6053f-74be-41e6-870b-1606ba05ea13"
-    token="ISSecretKey_live_cac49ead-e1fd-4f24-81bf-d3b89d3649ec"
+    publishable_key = ""
+    token=""
     service = APIService(token=token,publishable_key=publishable_key)
     response = service.collect.mpesa_stk_push(phone_number=mobile,email=email, amount=amount, narrative="Purchase")
     return JsonResponse(response)
