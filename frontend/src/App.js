@@ -15,6 +15,8 @@ import AllProducts from './components/allproducts';
 import Checkout from './components/checkout';
 import OrderSuccess from './components/ordersuccess';
 import OrderFailed from './components/orderfailed';
+import AllSellers from './components/allsellers';
+import SellerDetail from './components/sellerdetail';
 
 import CustomerRegister from './components/customer/register';
 import CustomerLogin from './components/customer/login';
@@ -27,6 +29,7 @@ import CustomerChangePassword from './components/customer/change-password';
 import CustomerAddressList from './components/customer/addresslist';
 import CustomerAddAddress from './components/customer/addaddress';
 import CustomerUpdateAddress from './components/customer/updateaddress';
+import AddReview from './components/customer/add-review';
 
 import SellerRegister from './components/seller/register';
 import SellerLogin from './components/seller/login';
@@ -38,6 +41,9 @@ import UpdateProduct from './components/seller/update-product';
 import SellerOrders from './components/seller/orders';
 import SellerCustomers from './components/seller/customers';
 import SellerReports from './components/seller/reports';
+import SellerDailyReports from './components/seller/daily-reports';
+import SellerMonthlyReports from './components/seller/monthly-reports';
+import SellerYearlyReports from './components/seller/yearly-reports';
 import SellerProfile from './components/seller/profile';
 import SellerChangePassword from './components/seller/change-password';
 import SellerCustomerOrders from './components/seller/customerorders';
@@ -51,6 +57,7 @@ const currentCurrency=localStorage.getItem('currency');
 function App() {
   const [cartData,setCartData]=useState(JSON.parse(checkCart));
   const [CurrencyData, setCurrencyData]=useState(currentCurrency);
+  
   return (
     <CurrencyContext.Provider value={{CurrencyData,setCurrencyData}}>    
     <CartContext.Provider value={{cartData,setCartData}}>
@@ -66,6 +73,8 @@ function App() {
         <Route path='/confirm-order' element={<ConfirmOrder/>} />
         <Route path='/order/success' element={<OrderSuccess/>} />
         <Route path='/order/failed' element={<OrderFailed/>} />
+        <Route path='/sellers' element={<AllSellers/>} />
+        <Route path='/seller/:seller_id/:vendor_name' element={<SellerDetail/>} />
 
         <Route path='/customer/register' element={<CustomerRegister/>} />
         <Route path='/customer/login' element={<CustomerLogin/>} />
@@ -78,6 +87,7 @@ function App() {
         <Route path='/customer/addresses' element={<CustomerAddressList/>} />
         <Route path='/customer/addaddress' element={<CustomerAddAddress/>} />
         <Route path='/customer/update-address/:address_id' element={<CustomerUpdateAddress/>} />
+        <Route path='/customer/add-review/:product_id' element={<AddReview/>} />
         
         <Route path='/seller/register' element={<SellerRegister/>} />
         <Route path='/seller/login' element={<SellerLogin/>} />
@@ -90,6 +100,9 @@ function App() {
         <Route path='/seller/customers' element={<SellerCustomers/>} />
         <Route path='/seller/customer/:customer_id/orderitems' element={<SellerCustomerOrders/>} />
         <Route path='/seller/reports' element={<SellerReports/>} />
+        <Route path='/seller/daily-report' element={<SellerDailyReports/>} />
+        <Route path='/seller/monthly-report' element={<SellerMonthlyReports/>} />
+        <Route path='/seller/yearly-report' element={<SellerYearlyReports/>} />
         <Route path='/seller/profile' element={<SellerProfile/>} />
         <Route path='/seller/change-password' element={<SellerChangePassword/>} />
       </Routes>      

@@ -5,20 +5,29 @@ from . import models
 class VendorSerializer(serializers.ModelSerializer):
     class Meta:
         model=models.Vendor
-        fields=['id', 'user','address']
+        fields=['id', 'user','address','profile_img','categories']
 
     def __init__(self, *args, **kwargs):
         super(VendorSerializer, self). __init__(*args, **kwargs)
-        # self.Meta.depth = 1
+    
+    def to_representation(self, instance):
+      response= super().to_representation(instance)
+      response['user']=UserSerializer(instance.user).data
+      return response
 
 class VendorDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model=models.Vendor
-        fields=['id', 'user','address']
+        fields=['id', 'user','mobile','profile_img','address','show_chart_daily_orders','show_chart_monthly_orders','show_chart_yearly_orders','total_products']
 
     def __init__(self, *args, **kwargs):
         super(VendorDetailSerializer, self). __init__(*args, **kwargs)
         # self.Meta.depth = 1
+    
+    def to_representation(self, instance):
+      response= super().to_representation(instance)
+      response['user']=UserSerializer(instance.user).data
+      return response
 
 class ProductListSerializer(serializers.ModelSerializer):
     product_ratings=serializers.StringRelatedField(many=True, read_only=True)
@@ -46,11 +55,16 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         super(ProductDetailSerializer, self). __init__(*args, **kwargs)
         # self.Meta.depth = 1
+    
+    def to_representation(self, instance):
+      response= super().to_representation(instance)
+      response['vendor']=VendorDetailSerializer(instance.vendor).data
+      return response
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model=models.ProductCategory
-        fields=['id', 'title','detail']
+        fields=['id', 'title','detail','total_downloads','cat_img']
 
     def __init__(self, *args, **kwargs):
         super(CategorySerializer, self). __init__(*args, **kwargs)
@@ -96,7 +110,12 @@ class OrderSerializer(serializers.ModelSerializer):
   
   def __init__(self, *args, **kwargs):
         super(OrderSerializer, self). __init__(*args, **kwargs)
-        self.Meta.depth = 1
+        #self.Meta.depth = 1
+
+  def to_representation(self, instance):
+        response= super().to_representation(instance)
+        response['customer']=CustomerSerializer(instance.customer).data
+        return response
 
 class OrderItemSerializer(serializers.ModelSerializer):
   class Meta:
@@ -133,7 +152,11 @@ class ProductRatingSerializer(serializers.ModelSerializer):
 
     def __init__(self, *args, **kwargs):
         super(ProductRatingSerializer, self). __init__(*args, **kwargs)
-        self.Meta.depth = 1
+        
+    def to_representation(self, instance):
+      response= super().to_representation(instance)
+      response['customer']=CustomerSerializer(instance.customer).data
+      return response
 
 class WishlistSerializer(serializers.ModelSerializer):
     class Meta:

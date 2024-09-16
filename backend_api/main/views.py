@@ -7,12 +7,23 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-
+from django.contrib.auth.hashers import make_password
+from django.db.models import Count
+from intasend import APIService
 
 class VendorList(generics.ListCreateAPIView):
     queryset=models.Vendor.objects.all()
     serializer_class=serializers.VendorSerializer
+    pagination_class=pagination.PageNumberPagination
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if 'fetch_limit' in self.request.GET:
+            limit=int(self.request.GET['fetch_limit'])
+            qs=qs.annotate(downloads=Count('product')).order_by('-downloads','-id')
+            qs=qs[:limit]
+        return qs
+    
 class VendorDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset=models.Vendor.objects.all()
     serializer_class=serializers.VendorDetailSerializer
@@ -84,6 +95,17 @@ def VendorRegister(request):
             }
     return JsonResponse(msg)
 
+
+class VendorProductList(generics.ListCreateAPIView):
+    queryset=models.Product.objects.all()
+    serializer_class=serializers.ProductListSerializer
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        vendor_id=self.kwargs['vendor_id']
+        qs=qs.filter(vendor__id=vendor_id)
+        return qs
+
 class ProductList(generics.ListCreateAPIView):
     queryset=models.Product.objects.all()
     serializer_class=serializers.ProductListSerializer
@@ -97,6 +119,10 @@ class ProductList(generics.ListCreateAPIView):
             qs=qs.filter(category=category)
         if 'fetch_limit' in self.request.GET:
             limit=int(self.request.GET['fetch_limit'])
+            qs=qs[:limit]
+        if 'popular' in self.request.GET:
+            limit=int(self.request.GET['popular'])
+            qs=qs.order_by('-downloads','-id')
             qs=qs[:limit]
         return qs
 
@@ -143,6 +169,14 @@ class ProductDetail(generics.RetrieveUpdateDestroyAPIView):
 class CategoryList(generics.ListCreateAPIView):
     queryset=models.ProductCategory.objects.all()
     serializer_class=serializers.CategorySerializer
+    
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if 'popular' in self.request.GET:
+            limit=int(self.request.GET['popular'])
+            qs=qs.annotate(downloads=Count('product')).order_by('-downloads','-id')
+            qs=qs[:limit]
+        return qs
 
 class CategoryDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset=models.ProductCategory.objects.all()
@@ -299,7 +333,12 @@ class ProductRatingViewSet(viewsets.ModelViewSet):
 @csrf_exempt
 def update_order_status(request,order_id):
     if request.method=='POST':
-        updateRes=models.Order.objects.filter(id=order_id).update(order_status=True)
+        if 'payment_mode' in request.POST:
+            payment_mode=request.POST.get('payment_mode')
+            trans_ref=request.POST.get('trans_ref')
+            updateRes=models.Order.objects.filter(id=order_id).update(order_status=True,payment_mode=payment_mode,trans_ref=trans_ref)
+        else:            
+            updateRes=models.Order.objects.filter(id=order_id).update(order_status=True)
         msg={
             'bool':False,
         }
@@ -422,3 +461,53 @@ def customer_dashboard(request,pk):
     }
     return JsonResponse(msg)
 
+@csrf_exempt
+def vendor_dashboard(request,pk):
+    vendor_id=pk
+    totalProducts=models.Product.objects.filter(vendor__id=vendor_id).count()
+    totalOrders=models.OrderItems.objects.filter(product__vendor__id=vendor_id).count()
+    totalCustomers=models.OrderItems.objects.filter(product__vendor__id=vendor_id).values('order__customer').count()
+    msg={
+        'totalProducts':totalProducts,
+        'totalCustomers':totalCustomers,
+        'totalOrders':totalOrders,
+    }
+    return JsonResponse(msg)
+
+@csrf_exempt
+def vendor_change_password(request,vendor_id):
+    password=request.POST.get('password')
+    vendor=models.Vendor.objects.get(id=vendor_id)
+    user=vendor.user
+    user.password=make_password(password)
+    user.save()
+    msg={
+        'bool':True,
+        'msg':'passowrd changed successfully'
+    }
+    return JsonResponse(msg)
+
+@csrf_exempt
+def customer_change_password(request,customer_id):
+    password=request.POST.get('password')
+    customer=models.Customer.objects.get(id=customer_id)
+    user=customer.user
+    user.password=make_password(password)
+    user.save()
+    msg={
+        'bool':True,
+        'msg':'passowrd changed successfully'
+    }
+    return JsonResponse(msg)
+
+@csrf_exempt
+def mpesapay(request,customer_id):
+    amount=request.POST.get('amount')
+    mobile=request.POST.get('mobile')
+    email=request.POST.get('email')
+    publishable_key = "ISPubKey_live_afc6053f-74be-41e6-870b-1606ba05ea13"
+    token="ISSecretKey_live_cac49ead-e1fd-4f24-81bf-d3b89d3649ec"
+    service = APIService(token=token,publishable_key=publishable_key)
+    response = service.collect.mpesa_stk_push(phone_number=mobile,email=email, amount=amount, narrative="Purchase")
+    return JsonResponse(response)
+    

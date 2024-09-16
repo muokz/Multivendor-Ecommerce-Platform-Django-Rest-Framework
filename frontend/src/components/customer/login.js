@@ -54,8 +54,10 @@ function CustomerLogin(props){
                 <div className="col-12 col-lg-4 reglogincon">
                     <div className="card shadow-sm border border-secondary border-opacity-10">
                         <div className="card-header"><h5>Login</h5></div>
-                        <div className="card-body">                        
-                            <form>
+                        <div className="card-body">                          
+                                {formError &&
+                                    <p className='text-danger'>{errorMsg}</p>
+                                }
                                 <div className="mb-3">
                                     <label for="lnm" className="form-label">User Name</label>
                                     <input type="text" name='username' value={loginFormData.username} onChange={inputHandler} className="form-control" id="lnm"/>
@@ -68,10 +70,6 @@ function CustomerLogin(props){
                                     <p>Dont have an account? <Link to="/customer/register">Register</Link></p>
                                 </div>
                                 <button type="button" disabled={!buttonEnable} onClick={submitHandler} className="col-12 btn btn-primary">Submit</button>
-                                {formError &&
-                                    <p className='text-danger'>{errorMsg}</p>
-                                }
-                            </form>
                         </div>
                     </div>
                 </div>

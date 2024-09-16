@@ -1,6 +1,6 @@
 import axios from "axios";
 import {Link} from 'react-router-dom';
-import { Download,CheckCircle, Loader} from 'react-feather';
+import { Download,CheckCircle, Loader, Star} from 'react-feather';
 import { useState,useContext } from 'react';
 import { CurrencyContext } from "../../context";
 function OrderRow(props){
@@ -55,7 +55,11 @@ function OrderRow(props){
             <td>
                 {
                     item.order.order_status==true && <button target='_blank' onClick={()=>countDownloads(item.product.id)} className='btn btn-primary btn-sm border-0'><Download /> Download <span className='badge text-dark bg-white'>{TotalDownloads}</span> </button>
-                }                                                
+                }
+                {
+                    item.order.order_status==true && <Link to={`/customer/add-review/${item.product.id}`} className='btn btn-warning btn-sm border-0 ms-2'><Star /> Add Review </Link>
+                }
+                                                                
             </td>
         </tr>
     );

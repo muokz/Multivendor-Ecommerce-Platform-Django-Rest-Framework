@@ -22,7 +22,7 @@ function SellerCustomers(){
     function showConfirm(customer_id){
         var _confirm=window.confirm('Are your sure you want to delete?');
         if(_confirm){
-            axios.delete(baseUrl+'api/delete-customer-orders/'+customer_id+'/')
+            axios.delete(baseUrl+'api/delete-customer-orders/'+customer_id)
             .then(function (response){
                 if(response.bool==true){
                     fetchData(baseUrl+'api/seller/customer/'+customer_id+'/orderitems');

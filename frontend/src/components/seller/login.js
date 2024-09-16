@@ -65,7 +65,7 @@ function SellerLogin(props){
                                     <input type="password" name='password' value={loginFormData.password} onChange={inputHandler} className="form-control" id="InputPassword1"/>
                                 </div>
                                 <div className="mb-3 form-check">
-                                    <p>Dont have an account? <Link to="/customer/register">Register</Link></p>
+                                    <p>Dont have an account? <Link to="/seller/register">Register</Link></p>
                                 </div>
                                 <button type="button" disabled={!buttonEnable} onClick={submitHandler} className="col-12 btn btn-primary">Submit</button>
                                 {formError &&

@@ -1,4 +1,3 @@
-import logo from '../logo.svg';
 import {Link} from 'react-router-dom';
 import { ShoppingCart, Heart, CreditCard, Monitor} from 'react-feather';
 import SingleProduct from './singleproduct';
@@ -6,6 +5,7 @@ import { useState,useEffect, useContext } from 'react';
 import { useParams } from "react-router-dom";
 import { UserContext,CartContext,CurrencyContext } from '../context';
 import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 
 function ProductDetail(){    
     const baseUrl = 'http://127.0.0.1:8000/api';
@@ -20,6 +20,7 @@ function ProductDetail(){
     const [ProductInWishlist,setProductInWishlist]=useState(false);
     
     const {CurrencyData}=useContext(CurrencyContext);
+    const location = useLocation();
 
     useEffect(()=>{
         fetchData(baseUrl+'/product/'+product_id);
@@ -27,6 +28,20 @@ function ProductDetail(){
         checkProductInCart(product_id);
         checkProductInWishlist(baseUrl+'/check-in-wishlist/',product_id);
     },[]);
+
+    useEffect(() => {
+        pagereload();
+      }, [location]);
+
+    function pagereload(){
+        const reloadCount = sessionStorage.getItem('reloadCount');
+        if(reloadCount < 1) {
+          sessionStorage.setItem('reloadCount', String(reloadCount + 1));
+          window.location.reload();
+        } else {
+          sessionStorage.removeItem('reloadCount');
+        }
+      }
 
     function checkProductInCart(product_id){
         var previousCart=localStorage.getItem('cartData');
@@ -55,6 +70,7 @@ function ProductDetail(){
         .then((response) => response.json())
         .then((data) => {
             setrelatedProduct(data.results);
+            fetchData(baseUrl+'/product/'+product_id);
         });
     }
 
@@ -91,6 +107,36 @@ function ProductDetail(){
             localStorage.setItem('cartData',cartString);
         }        
         setcartButtonClickStatus(true);
+    }
+    const buyAddButtonHandler = () => {
+        let previousCart=localStorage.getItem('cartData');
+        let cartJson=JSON.parse(previousCart);
+        const cartData={
+            'product':{
+                'id':productData.id,
+                'title':productData.title,
+                'image':productData.image,
+                'price':productData.price,
+                'usd_price':productData.usd_price,
+            },
+            'user':{
+                'id':1,
+            },
+            'total_amount':0
+        }
+        if(cartJson!=null){
+            cartJson.push(cartData);
+            var cartString=JSON.stringify(cartJson);
+            localStorage.setItem('cartData',cartString);
+            setCartData(cartJson);
+        }else{
+            var newCartList=[];
+            newCartList.push(cartData);
+            var cartString=JSON.stringify(newCartList);
+            localStorage.setItem('cartData',cartString);
+        }        
+        setcartButtonClickStatus(true);
+        window.location.href='/checkout';
     }
     const cartRemoveButtonHandler = () => {
         var previousCart=localStorage.getItem('cartData');
@@ -192,7 +238,10 @@ function ProductDetail(){
                     {
                         CurrencyData == 'usd' && <h5 className="card-title text-info">Price: ${productData.usd_price}</h5>
                     }
-                    
+                    {
+                        productData.vendor && <Link to={`/seller/${productData.vendor.id}/${productData.vendor.user.username}`}><h6 className="card-title text-dark mt-3">Seller Name: {productData.vendor.user.username}</h6></Link> 
+                    }
+                   
                     <Link to="#"><button className="btn btn-dark mt-4"><Monitor /> Demo</button></Link> 
                     {
                         (userContext && !ProductInWishlist) && 
@@ -212,7 +261,7 @@ function ProductDetail(){
                         {cartButtonClickStatus &&
                             <button type="button" onClick={cartRemoveButtonHandler} className="btn btn-warning mb-3"><ShoppingCart /> Remove From cart</button> 
                         }
-                        <button type="button" className="btn btn-danger ms-3 mb-3"><CreditCard /> Buy Now</button>
+                        <button type="button"  onClick={buyAddButtonHandler} className="btn btn-danger ms-3 mb-3"><CreditCard /> Buy Now</button>
                     </div>
                     <div className="card-footer border-0 mt-4"> 
                     <h5>Tags</h5>            
@@ -226,7 +275,7 @@ function ProductDetail(){
                     
                     <div className="row mb-5">
                             {
-                                relatedProducts.map((product)=><SingleProduct product={product} />)
+                                relatedProducts.map((product,index)=><SingleProduct key={index} product={product} />)
                             }
                     </div>
                 </div>
