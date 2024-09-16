@@ -21,7 +21,7 @@ Welcome to the **Multivendor E-commerce Project**, a robust and scalable solutio
 - **Backend**: Django Rest Framework (Python)
 - **Frontend**: ReactJS (JavaScript)
 - **Database**: PostgreSQL
-- **Payment Gateway**: PayPal API
+- **Payment Gateway**: PayPal API, Instasend (Kenya - Mpesa Payment)
 - **Authentication**: JSON Web Tokens (JWT)
 
 ## 📦 Installation
