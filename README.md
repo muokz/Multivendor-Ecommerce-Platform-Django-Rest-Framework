@@ -1,7 +1,3 @@
-Here’s a template for a `README.md` file for your multivendor e-commerce project:
-
----
-
 # Multivendor E-commerce Platform for Selling Software
 
 Welcome to the **Multivendor E-commerce Project**, a robust and scalable solution built using Django Rest Framework, ReactJS, and PostgreSQL. This platform is designed to facilitate the buying and selling of software products from multiple vendors in a secure, efficient, and user-friendly environment.
